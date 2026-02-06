@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="min-h-screen flex" x-data="{ sidebarOpen: true, sidebarCollapsed: false }">
+
+    <!-- Sidebar -->
+    <aside
+        class="fixed inset-y-0 left-0 z-30 glass border-r border-gray-200 dark:border-white/5 transform transition-all duration-300 lg:translate-x-0 lg:static flex flex-col"
+        :class="[
+            sidebarOpen ? 'translate-x-0' : '-translate-x-full',
+            sidebarCollapsed ? 'w-20' : 'w-64'
+        ]"
+    >
+        <!-- Logo -->
+        <div class="h-16 flex items-center gap-3 px-4 border-b border-gray-200 dark:border-white/5 flex-shrink-0">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center flex-shrink-0 glow-sm">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                </svg>
+            </div>
+            <div x-show="!sidebarCollapsed" x-transition class="overflow-hidden">
+                <h1 class="font-bold text-gray-900 dark:text-white">EduPlatform</h1>
+                <p class="text-xs text-gray-500 dark:text-gray-500">Boshqaruv paneli</p>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="p-3 space-y-1 flex-1 overflow-y-auto">
+            <p x-show="!sidebarCollapsed" class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider px-3 mb-3">Asosiy</p>
+
+            <a href="{% url 'dashboard:index' %}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all {% if request.resolver_match.url_name == 'index' %}bg-primary-500/10 dark:bg-primary-500/20 text-primary-600 dark:text-primary-400{% else %}text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white{% endif %}"
+               :class="sidebarCollapsed && 'justify-center'"
+               title="Dashboard">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/>
+                </svg>
+                <span x-show="!sidebarCollapsed">Dashboard</span>
+            </a>
+
+            <p x-show="!sidebarCollapsed" class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider px-3 mb-3 mt-6">Boshqaruv</p>
+
+            <a href="{% url 'dashboard:group_type_list' %}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all {% if 'group_type' in request.resolver_match.url_name %}bg-primary-500/10 dark:bg-primary-500/20 text-primary-600 dark:text-primary-400{% else %}text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white{% endif %}"
+               :class="sidebarCollapsed && 'justify-center'"
+               title="Yo'nalishlar">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                </svg>
+                <span x-show="!sidebarCollapsed">Yo'nalishlar</span>
+            </a>
+
+            <a href="{% url 'dashboard:group_list' %}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all {% if request.resolver_match.url_name == 'group_list' or request.resolver_match.url_name == 'group_detail' or request.resolver_match.url_name == 'group_create' or request.resolver_match.url_name == 'group_edit' %}bg-primary-500/10 dark:bg-primary-500/20 text-primary-600 dark:text-primary-400{% else %}text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white{% endif %}"
+               :class="sidebarCollapsed && 'justify-center'"
+               title="Guruhlar">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+                <span x-show="!sidebarCollapsed">Guruhlar</span>
+            </a>
+
+            <a href="{% url 'dashboard:student_list' %}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all {% if 'student' in request.resolver_match.url_name %}bg-primary-500/10 dark:bg-primary-500/20 text-primary-600 dark:text-primary-400{% else %}text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white{% endif %}"
+               :class="sidebarCollapsed && 'justify-center'"
+               title="O'quvchilar">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                </svg>
+                <span x-show="!sidebarCollapsed">O'quvchilar</span>
+            </a>
+
+            <a href="{% url 'dashboard:lesson_list' %}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all {% if 'lesson' in request.resolver_match.url_name %}bg-primary-500/10 dark:bg-primary-500/20 text-primary-600 dark:text-primary-400{% else %}text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white{% endif %}"
+               :class="sidebarCollapsed && 'justify-center'"
+               title="Darslar">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                </svg>
+                <span x-show="!sidebarCollapsed">Darslar</span>
+            </a>
+
+            <a href="{% url 'dashboard:quiz_list' %}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all {% if 'quiz' in request.resolver_match.url_name or 'question' in request.resolver_match.url_name %}bg-primary-500/10 dark:bg-primary-500/20 text-primary-600 dark:text-primary-400{% else %}text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white{% endif %}"
+               :class="sidebarCollapsed && 'justify-center'"
+               title="Testlar">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                </svg>
+                <span x-show="!sidebarCollapsed">Testlar</span>
+            </a>
+
+            {% if request.user.is_super_admin %}
+            <p x-show="!sidebarCollapsed" class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider px-3 mb-3 mt-6">Tizim</p>
+
+            <a href="{% url 'dashboard:admin_list' %}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all {% if 'admin' in request.resolver_match.url_name %}bg-primary-500/10 dark:bg-primary-500/20 text-primary-600 dark:text-primary-400{% else %}text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white{% endif %}"
+               :class="sidebarCollapsed && 'justify-center'"
+               title="Adminlar">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                </svg>
+                <span x-show="!sidebarCollapsed">Adminlar</span>
+            </a>
+            {% endif %}
+        </nav>
+
+        <!-- Collapse button & User info -->
+        <div class="border-t border-gray-200 dark:border-white/5 p-3">
+            <!-- Collapse toggle -->
+            <button
+                @click="sidebarCollapsed = !sidebarCollapsed"
+                class="hidden lg:flex w-full items-center justify-center gap-2 px-3 py-2 rounded-xl text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white transition-all mb-3"
+            >
+                <svg class="w-5 h-5 transition-transform" :class="sidebarCollapsed && 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+                </svg>
+                <span x-show="!sidebarCollapsed" class="text-sm">Yig'ish</span>
+            </button>
+
+            <!-- User info -->
+            <div class="flex items-center gap-3 p-2 rounded-xl bg-gray-100 dark:bg-dark-700/50" :class="sidebarCollapsed && 'justify-center'">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-purple-500 flex items-center justify-center text-white font-semibold flex-shrink-0">
+                    {{ request.user.full_name|slice:":1"|upper }}
+                </div>
+                <div x-show="!sidebarCollapsed" class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ request.user.full_name }}</p>
+                    <p class="text-xs text-gray-500">{{ request.user.get_role_display }}</p>
+                </div>
+                <a x-show="!sidebarCollapsed" href="{% url 'accounts:logout' %}" class="p-2 text-gray-400 hover:text-red-500 transition-colors" title="Chiqish">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main content -->
+    <div class="flex-1 flex flex-col min-w-0">
+        <!-- Top navbar -->
+        <header class="h-16 glass border-b border-gray-200 dark:border-white/5 flex items-center justify-between px-6 sticky top-0 z-20">
+            <div class="flex items-center gap-4">
+                <!-- Mobile menu button -->
+                <button @click="sidebarOpen = !sidebarOpen" class="lg:hidden p-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white rounded-xl hover:bg-gray-100 dark:hover:bg-white/5 transition-all">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{% block page_title %}Dashboard{% endblock %}</h2>
+                    <p class="text-xs text-gray-500 hidden sm:block">{% block page_subtitle %}Boshqaruv paneli{% endblock %}</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                {% block header_actions %}{% endblock %}
+
+                <!-- Theme toggle -->
+                {% include 'components/theme_toggle.html' %}
+            </div>
+        </header>
+
+        <!-- Page content -->
+        <main class="flex-1 p-6 overflow-auto bg-gray-50 dark:bg-dark-950">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</div>
+
+<!-- Mobile sidebar overlay -->
+    <div
+        x-show="sidebarOpen"
+        @click="sidebarOpen = false"
+        class="fixed inset-0 bg-black/50 backdrop-blur-sm z-20 lg:hidden"
+        x-transition:enter="transition-opacity ease-out duration-300"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition-opacity ease-in duration-200"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+    ></div>
+</div>
+{% endblock %}

@@ -1,0 +1,139 @@
+{% extends 'admin_panel/base_admin.html' %}
+
+{% block page_title %}Yangi admin{% endblock %}
+{% block page_subtitle %}Yangi administrator qo'shish{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl">
+    <!-- Back link -->
+    <a href="{% url 'dashboard:admin_list' %}" class="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 mb-6 transition-colors group">
+        <svg class="w-5 h-5 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+        Adminlarga qaytish
+    </a>
+    
+    <div class="glass rounded-2xl p-8">
+        <div class="flex items-center gap-4 mb-8">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-red-500 flex items-center justify-center shadow-lg shadow-amber-500/30">
+                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                </svg>
+            </div>
+            <div>
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white">Yangi admin</h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Administrator huquqlarini berish</p>
+            </div>
+        </div>
+        
+        <!-- Warning -->
+        <div class="flex items-start gap-3 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 mb-8">
+            <svg class="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+            <div>
+                <p class="text-sm font-medium text-amber-600 dark:text-amber-400">Diqqat!</p>
+                <p class="text-sm text-amber-600/80 dark:text-amber-400/80">Admin barcha ma'lumotlarni ko'rish, o'zgartirish va o'chirish huquqiga ega bo'ladi.</p>
+            </div>
+        </div>
+        
+        <form method="post" x-data="{ loading: false, isSuper: false }" @submit="loading = true">
+            {% csrf_token %}
+            
+            <div class="space-y-6">
+                <!-- Full name -->
+                <div>
+                    <label for="full_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        To'liq ism <span class="text-red-500">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="full_name" 
+                        name="full_name"
+                        placeholder="Masalan: Aliyev Ali"
+                        class="w-full bg-gray-100 dark:bg-dark-700 border-2 border-transparent rounded-xl py-3 px-4 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-primary-500 focus:bg-white dark:focus:bg-dark-800 transition-all"
+                        required
+                    >
+                </div>
+                
+                <!-- Phone number -->
+                <div>
+                    <label for="phone_number" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Telefon raqam <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 font-medium">+998</span>
+                        <input 
+                            type="tel" 
+                            id="phone_number" 
+                            name="phone_number"
+                            placeholder="90 123 45 67"
+                            maxlength="12"
+                            class="w-full bg-gray-100 dark:bg-dark-700 border-2 border-transparent rounded-xl py-3 pl-16 pr-4 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-primary-500 focus:bg-white dark:focus:bg-dark-800 transition-all"
+                            required
+                        >
+                    </div>
+                    <p class="mt-2 text-xs text-gray-500">Admin shu raqam bilan tizimga kiradi</p>
+                </div>
+                
+                <!-- Super admin toggle -->
+                <div class="flex items-center justify-between p-4 rounded-xl bg-gray-50 dark:bg-dark-700/50 border-2 border-transparent" :class="isSuper && 'border-amber-500/30 bg-amber-500/5 dark:bg-amber-500/10'">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center" :class="isSuper ? 'bg-amber-500/20' : 'bg-gray-100 dark:bg-dark-700'">
+                            <svg class="w-5 h-5" :class="isSuper ? 'text-amber-500' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="font-medium text-gray-900 dark:text-white">Super Admin</p>
+                            <p class="text-sm text-gray-500">Boshqa adminlarni boshqarish huquqi</p>
+                        </div>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" name="is_super" class="sr-only peer" x-model="isSuper">
+                        <div class="w-11 h-6 bg-gray-200 dark:bg-dark-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+                    </label>
+                </div>
+                
+                <!-- Super admin warning -->
+                <div x-show="isSuper" x-transition class="flex items-start gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/20">
+                    <svg class="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                    <div>
+                        <p class="text-sm font-medium text-red-600 dark:text-red-400">Super Admin huquqlari</p>
+                        <p class="text-sm text-red-600/80 dark:text-red-400/80">Bu foydalanuvchi boshqa adminlarni qo'shish va o'chirish, shuningdek barcha tizim sozlamalarini o'zgartirish imkoniyatiga ega bo'ladi.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="flex items-center gap-4 mt-8 pt-6 border-t border-gray-200 dark:border-white/10">
+                <button 
+                    type="submit"
+                    :disabled="loading"
+                    class="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium px-6 py-3 rounded-xl transition-all hover:shadow-lg hover:shadow-primary-500/30"
+                >
+                    <span x-show="!loading">
+                        <svg class="w-5 h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                        </svg>
+                        Admin qo'shish
+                    </span>
+                    <span x-show="loading" class="flex items-center gap-2">
+                        <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Qo'shilmoqda...
+                    </span>
+                </button>
+                
+                <a href="{% url 'dashboard:admin_list' %}" class="px-6 py-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white font-medium transition-colors">
+                    Bekor qilish
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

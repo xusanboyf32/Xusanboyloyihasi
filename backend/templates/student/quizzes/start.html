@@ -1,0 +1,73 @@
+{% extends 'student/base_student.html' %}
+
+{% block title %}{{ quiz.title }} - Test{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <!-- Header -->
+    <div class="glass rounded-2xl p-6 mb-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-xl font-bold text-gray-900 dark:text-white">{{ quiz.title }}</h1>
+                <p class="text-sm text-gray-500">{{ attempt_number }}-urinish • {{ questions|length }} savol</p>
+            </div>
+            <div class="text-right">
+                <p class="text-sm text-gray-500">O'tish balli</p>
+                <p class="text-2xl font-bold text-primary-500">{{ quiz.passing_score }}%</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Questions form -->
+    <form method="post" action="{% url 'quizzes:submit' quiz.pk %}" x-data="{ loading: false, answered: {} }" @submit="loading = true">
+        {% csrf_token %}
+        
+        <div class="space-y-6">
+            {% for question in questions %}
+            <div class="glass rounded-2xl p-6">
+                <div class="flex items-start gap-4 mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-primary-500/20 flex items-center justify-center flex-shrink-0">
+                        <span class="text-lg font-bold text-primary-500">{{ forloop.counter }}</span>
+                    </div>
+                    <p class="text-gray-900 dark:text-white font-medium pt-2">{{ question.text }}</p>
+                </div>
+
+                <div class="ml-14 space-y-3">
+                    {% for answer in question.answers.all %}
+                    <label class="flex items-center gap-3 p-4 rounded-xl bg-gray-50 dark:bg-dark-700/50 cursor-pointer hover:bg-gray-100 dark:hover:bg-dark-700 transition-colors border-2 border-transparent"
+                           :class="{ 'border-primary-500 bg-primary-500/10': answered['{{ question.pk }}'] == '{{ answer.pk }}' }">
+                        <input type="radio" name="question_{{ question.pk }}" value="{{ answer.pk }}"
+                               @change="answered['{{ question.pk }}'] = '{{ answer.pk }}'"
+                               class="w-5 h-5 text-primary-500 bg-gray-200 dark:bg-dark-600 border-0 focus:ring-primary-500 focus:ring-2">
+                        <span class="text-gray-700 dark:text-gray-300">{{ answer.text }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Submit button -->
+        <div class="mt-8 flex items-center justify-between">
+            <a href="{% url 'quizzes:detail' quiz.pk %}" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+                ← Orqaga
+            </a>
+            
+            <button type="submit" :disabled="loading"
+                    class="inline-flex items-center gap-2 bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 disabled:opacity-50 text-white font-semibold py-4 px-8 rounded-2xl transition-all glow-sm hover:glow text-lg">
+                <span x-show="!loading">Topshirish</span>
+                <span x-show="loading" class="flex items-center gap-2">
+                    <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                    </svg>
+                    Tekshirilmoqda...
+                </span>
+                <svg x-show="!loading" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

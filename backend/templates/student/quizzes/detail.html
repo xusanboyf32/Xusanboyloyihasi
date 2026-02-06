@@ -1,0 +1,126 @@
+{% extends 'student/base_student.html' %}
+
+{% block title %}{{ quiz.title }} - EduPlatform{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <!-- Back link -->
+    <a href="{% url 'student:lesson_detail' quiz.lesson.pk %}" class="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 mb-6 transition-colors group">
+        <svg class="w-5 h-5 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+        Darsga qaytish
+    </a>
+
+    <!-- Quiz info card -->
+    <div class="glass rounded-2xl p-8 mb-6">
+        <div class="flex items-start gap-4 mb-6">
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 dark:from-purple-500/30 dark:to-pink-500/30 flex items-center justify-center flex-shrink-0">
+                <svg class="w-8 h-8 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                </svg>
+            </div>
+            <div class="flex-1">
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ quiz.title }}</h1>
+                <p class="text-gray-500 dark:text-gray-400">{{ quiz.lesson.order }}-dars: {{ quiz.lesson.title }}</p>
+            </div>
+        </div>
+
+        <!-- Stats grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+            <div class="p-4 rounded-xl bg-gray-50 dark:bg-dark-700/50 text-center">
+                <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ quiz.questions.count }}</p>
+                <p class="text-sm text-gray-500">Savollar</p>
+            </div>
+            <div class="p-4 rounded-xl bg-gray-50 dark:bg-dark-700/50 text-center">
+                <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ quiz.passing_score }}%</p>
+                <p class="text-sm text-gray-500">O'tish balli</p>
+            </div>
+            <div class="p-4 rounded-xl bg-gray-50 dark:bg-dark-700/50 text-center">
+                <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ remaining_attempts }}</p>
+                <p class="text-sm text-gray-500">Qolgan urinish</p>
+            </div>
+            <div class="p-4 rounded-xl bg-gray-50 dark:bg-dark-700/50 text-center">
+                {% if best_attempt %}
+                <p class="text-2xl font-bold {% if best_attempt.is_passed %}text-green-500{% else %}text-amber-500{% endif %}">{{ best_attempt.score }}%</p>
+                <p class="text-sm text-gray-500">Eng yaxshi</p>
+                {% else %}
+                <p class="text-2xl font-bold text-gray-400">-</p>
+                <p class="text-sm text-gray-500">Eng yaxshi</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Status -->
+        {% if has_passed %}
+        <div class="flex items-center gap-3 p-4 rounded-xl bg-green-500/10 border border-green-500/20 mb-6">
+            <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <div>
+                <p class="font-medium text-green-600 dark:text-green-400">Siz bu testdan muvaffaqiyatli o'tdingiz!</p>
+                <p class="text-sm text-green-600/70 dark:text-green-400/70">Keyingi darsga o'tishingiz mumkin</p>
+            </div>
+        </div>
+        {% elif not can_attempt %}
+        <div class="flex items-center gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/20 mb-6">
+            <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <div>
+                <p class="font-medium text-red-600 dark:text-red-400">{{ attempt_reason }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Start button -->
+        {% if can_attempt %}
+        <a href="{% url 'quizzes:start' quiz.pk %}" 
+           class="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 text-white font-semibold py-4 px-6 rounded-2xl transition-all glow-sm hover:glow text-lg">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Testni boshlash
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Previous attempts -->
+    {% if attempts %}
+    <div class="glass rounded-2xl p-6">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Urinishlar tarixi</h3>
+        
+        <div class="space-y-3">
+            {% for attempt in attempts %}
+            <div class="flex items-center justify-between p-4 rounded-xl bg-gray-50 dark:bg-dark-700/50">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-xl {% if attempt.is_passed %}bg-green-500/20{% else %}bg-red-500/20{% endif %} flex items-center justify-center">
+                        {% if attempt.is_passed %}
+                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        {% else %}
+                        <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <p class="font-medium text-gray-900 dark:text-white">{{ forloop.revcounter }}-urinish</p>
+                        <p class="text-sm text-gray-500">{{ attempt.created_at|date:"d.m.Y H:i" }}</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-2xl font-bold {% if attempt.is_passed %}text-green-500{% else %}text-red-500{% endif %}">{{ attempt.score }}%</p>
+                    <p class="text-sm {% if attempt.is_passed %}text-green-500{% else %}text-red-500{% endif %}">
+                        {% if attempt.is_passed %}O'tdi{% else %}O'tmadi{% endif %}
+                    </p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

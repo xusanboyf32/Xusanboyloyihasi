@@ -1,0 +1,180 @@
+{% extends 'admin_panel/base_admin.html' %}
+
+{% block page_title %}{% if lesson %}Darsni tahrirlash{% else %}Yangi dars{% endif %}{% endblock %}
+{% block page_subtitle %}{% if lesson %}{{ lesson.title }}{% else %}Yangi video dars qo'shish{% endif %}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl">
+    <!-- Back link -->
+    <a href="{% url 'dashboard:lesson_list' %}" class="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 mb-6 transition-colors group">
+        <svg class="w-5 h-5 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+        Darslarga qaytish
+    </a>
+    
+    <div class="glass rounded-2xl p-8">
+        <div class="flex items-center gap-4 mb-8">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 dark:from-blue-500/30 dark:to-purple-500/30 flex items-center justify-center">
+                <svg class="w-7 h-7 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                </svg>
+            </div>
+            <div>
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white">
+                    {% if lesson %}Darsni tahrirlash{% else %}Yangi dars{% endif %}
+                </h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Video va materiallarni qo'shing</p>
+            </div>
+        </div>
+        
+        <form method="post" x-data="{ loading: false, isActive: {% if lesson %}{{ lesson.is_active|yesno:'true,false' }}{% else %}true{% endif %} }" @submit="loading = true">
+            {% csrf_token %}
+            
+            <div class="space-y-6">
+                <!-- Title -->
+                <div>
+                    <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Dars nomi <span class="text-red-500">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="title" 
+                        name="title"
+                        value="{{ lesson.title|default:'' }}"
+                        placeholder="Masalan: Python asoslari - O'zgaruvchilar"
+                        class="w-full bg-gray-100 dark:bg-dark-700 border-2 border-transparent rounded-xl py-3 px-4 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-primary-500 focus:bg-white dark:focus:bg-dark-800 transition-all"
+                        required
+                    >
+                </div>
+                
+                <!-- Order -->
+                <div>
+                    <label for="order" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Tartib raqami <span class="text-red-500">*</span>
+                    </label>
+                    <input 
+                        type="number" 
+                        id="order" 
+                        name="order"
+                        value="{{ lesson.order|default:'1' }}"
+                        min="1"
+                        class="w-full bg-gray-100 dark:bg-dark-700 border-2 border-transparent rounded-xl py-3 px-4 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-primary-500 focus:bg-white dark:focus:bg-dark-800 transition-all"
+                        required
+                    >
+                    <p class="mt-2 text-xs text-gray-500">Darslar shu tartibda ko'rsatiladi</p>
+                </div>
+                
+                <!-- Description -->
+                <div>
+                    <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Tavsif
+                    </label>
+                    <textarea 
+                        id="description" 
+                        name="description"
+                        rows="3"
+                        placeholder="Dars haqida qisqacha..."
+                        class="w-full bg-gray-100 dark:bg-dark-700 border-2 border-transparent rounded-xl py-3 px-4 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-primary-500 focus:bg-white dark:focus:bg-dark-800 transition-all resize-none"
+                    >{{ lesson.description|default:'' }}</textarea>
+                </div>
+                
+                <!-- Divider -->
+                <div class="border-t border-gray-200 dark:border-white/10 pt-6">
+                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-4">Integratsiyalar</h3>
+                </div>
+                
+                <!-- Kinescope Video ID -->
+                <div>
+                    <label for="kinescope_video_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <span class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                            </svg>
+                            Kinescope Video ID
+                        </span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="kinescope_video_id" 
+                        name="kinescope_video_id"
+                        value="{{ lesson.kinescope_video_id|default:'' }}"
+                        placeholder="Masalan: abc123xyz"
+                        class="w-full bg-gray-100 dark:bg-dark-700 border-2 border-transparent rounded-xl py-3 px-4 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-primary-500 focus:bg-white dark:focus:bg-dark-800 transition-all"
+                    >
+                    <p class="mt-2 text-xs text-gray-500">Kinescope platformasidan video ID ni kiriting</p>
+                </div>
+                
+                <!-- Notion Page ID -->
+                <div>
+                    <label for="notion_page_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <span class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-gray-600 dark:text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M4.459 4.208c.746.606 1.026.56 2.428.466l13.215-.793c.28 0 .047-.28-.046-.326L17.86 2.02c-.467-.373-.979-.467-1.632-.373L2.827 3.074c-.467.093-.56.28-.373.466l2.005 1.141v-.473zM5.672 7.229v12.57c0 .747.28 1.073.933 1.027l14.523-.84c.653-.046.746-.42.746-.887V7.696c0-.467-.14-.7-.513-.653l-15.176.886c-.42.046-.513.233-.513.653v-.353z"/>
+                            </svg>
+                            Notion Page ID
+                        </span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="notion_page_id" 
+                        name="notion_page_id"
+                        value="{{ lesson.notion_page_id|default:'' }}"
+                        placeholder="Masalan: abc123-xyz-456"
+                        class="w-full bg-gray-100 dark:bg-dark-700 border-2 border-transparent rounded-xl py-3 px-4 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-primary-500 focus:bg-white dark:focus:bg-dark-800 transition-all"
+                    >
+                    <p class="mt-2 text-xs text-gray-500">Qo'shimcha materiallar uchun Notion sahifa ID</p>
+                </div>
+                
+                {% if lesson %}
+                <!-- Is Active toggle -->
+                <div class="flex items-center justify-between p-4 rounded-xl bg-gray-50 dark:bg-dark-700/50">
+                    <div>
+                        <p class="font-medium text-gray-900 dark:text-white">Faol holat</p>
+                        <p class="text-sm text-gray-500">O'quvchilarga ko'rinadi</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" name="is_active" class="sr-only peer" x-model="isActive">
+                        <div class="w-11 h-6 bg-gray-200 dark:bg-dark-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-500"></div>
+                    </label>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Actions -->
+            <div class="flex items-center gap-4 mt-8 pt-6 border-t border-gray-200 dark:border-white/10">
+                <button 
+                    type="submit"
+                    :disabled="loading"
+                    class="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium px-6 py-3 rounded-xl transition-all hover:shadow-lg hover:shadow-primary-500/30"
+                >
+                    <span x-show="!loading">
+                        {% if lesson %}
+                        <svg class="w-5 h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        Saqlash
+                        {% else %}
+                        <svg class="w-5 h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        Yaratish
+                        {% endif %}
+                    </span>
+                    <span x-show="loading" class="flex items-center gap-2">
+                        <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Saqlanmoqda...
+                    </span>
+                </button>
+                
+                <a href="{% url 'dashboard:lesson_list' %}" class="px-6 py-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white font-medium transition-colors">
+                    Bekor qilish
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

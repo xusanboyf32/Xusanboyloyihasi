@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+
+{% block title %}Kodni tasdiqlash - EduPlatform{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center px-4 py-12 relative overflow-hidden">
+    <!-- Animated background -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="orb w-[600px] h-[600px] bg-primary-500/20 dark:bg-primary-500/10 -top-48 -left-48" style="animation-delay: 0s;"></div>
+        <div class="orb w-[500px] h-[500px] bg-purple-500/20 dark:bg-purple-500/10 -bottom-32 -right-32" style="animation-delay: 2s;"></div>
+        <div class="absolute inset-0 bg-[linear-gradient(rgba(0,212,170,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,212,170,0.03)_1px,transparent_1px)] bg-[size:60px_60px]"></div>
+    </div>
+
+    <!-- Theme toggle -->
+    <div class="absolute top-6 right-6">
+        {% include 'components/theme_toggle.html' %}
+    </div>
+
+    <div class="w-full max-w-md relative z-10">
+        <!-- Back button -->
+        <a href="{% url 'accounts:login' %}" class="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 mb-6 transition-colors group">
+            <svg class="w-5 h-5 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+            Orqaga qaytish
+        </a>
+
+        <!-- Card -->
+        <div class="glass rounded-3xl p-8 card-hover" x-data="otpVerify()">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br from-primary-500/20 to-purple-500/20 dark:from-primary-500/30 dark:to-purple-500/30 border-2 border-primary-500/30 mb-6">
+                    <svg class="w-10 h-10 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    </svg>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Tasdiqlash kodi</h2>
+                <p class="text-gray-500 dark:text-gray-400">
+                    <span class="text-primary-500 font-semibold">{{ masked_phone }}</span> raqami uchun
+                </p>
+            </div>
+
+            <!-- Telegram link -->
+            {% if deep_link %}
+            <a
+                href="{{ deep_link }}"
+                target="_blank"
+                class="flex items-center justify-center gap-3 w-full bg-[#2AABEE] hover:bg-[#229ED9] text-white font-semibold py-4 px-6 rounded-2xl transition-all duration-300 hover:shadow-lg hover:shadow-[#2AABEE]/30 mb-6 group"
+            >
+                <svg class="w-6 h-6 transition-transform group-hover:scale-110" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.18 1.897-.962 6.502-1.359 8.627-.168.9-.5 1.201-.82 1.23-.697.064-1.226-.461-1.901-.903-1.056-.692-1.653-1.123-2.678-1.799-1.185-.781-.417-1.21.258-1.911.177-.184 3.247-2.977 3.307-3.23.007-.032.015-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.139-5.062 3.345-.479.329-.913.489-1.302.481-.428-.009-1.252-.242-1.865-.442-.751-.244-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.831-2.529 6.998-3.015 3.333-1.386 4.025-1.627 4.477-1.635.099-.002.321.023.465.141.121.1.154.234.17.331.015.098.034.321.019.496z"/>
+                </svg>
+                Telegram orqali kod olish
+                <svg class="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                </svg>
+            </a>
+            {% endif %}
+
+            <div class="relative flex items-center justify-center mb-6">
+                <div class="border-t border-gray-200 dark:border-dark-600 w-full"></div>
+                <span class="bg-white dark:bg-dark-800 px-4 text-gray-400 dark:text-gray-500 text-sm absolute">yoki kodni kiriting</span>
+            </div>
+
+            <!-- OTP Form -->
+            <form method="post" action="{% url 'accounts:verify_otp' %}" @submit="loading = true">
+                {% csrf_token %}
+
+                <div class="mb-6">
+                    <label for="otp_code" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 text-center">
+                        6 xonali kodni kiriting
+                    </label>
+
+                    <!-- OTP Input styled -->
+                    <div class="flex justify-center gap-2">
+                        <input
+                            type="text"
+                            id="otp_code"
+                            name="otp_code"
+                            x-model="code"
+                            @input="code = code.replace(/[^0-9]/g, '').slice(0, 6)"
+                            placeholder="000000"
+                            maxlength="6"
+                            autocomplete="one-time-code"
+                            class="w-full bg-gray-100 dark:bg-dark-700 border-2 border-transparent rounded-2xl py-4 px-4 text-gray-900 dark:text-white text-center text-3xl tracking-[0.3em] placeholder-gray-300 dark:placeholder-gray-600 focus:outline-none focus:border-primary-500 focus:bg-white dark:focus:bg-dark-800 input-focus transition-all font-mono"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <!-- Timer -->
+                <div class="text-center mb-6">
+                    <div x-show="timer > 0" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-100 dark:bg-dark-700">
+                        <svg class="w-4 h-4 text-primary-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span class="text-sm text-gray-600 dark:text-gray-400">
+                            Kod <span class="text-primary-500 font-mono font-bold" x-text="formattedTime"></span> da eskiradi
+                        </span>
+                    </div>
+
+                    <div x-show="timer <= 0" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-50 dark:bg-red-500/10">
+                        <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span class="text-sm text-red-500">Kod eskirdi. Qaytadan oling.</span>
+                    </div>
+                </div>
+
+                <button
+                    type="submit"
+                    :disabled="loading || code.length !== 6 || timer <= 0"
+                    class="w-full bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 text-white font-semibold py-4 px-6 rounded-2xl focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 glow-sm hover:glow text-lg"
+                >
+                    <span x-show="!loading" class="flex items-center justify-center gap-2">
+                        Tasdiqlash
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                    </span>
+                    <span x-show="loading" class="flex items-center justify-center gap-2">
+                        <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Tekshirilmoqda...
+                    </span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function otpVerify() {
+    return {
+        code: '',
+        loading: false,
+        timer: 120,
+
+        init() {
+            this.startTimer();
+        },
+
+        startTimer() {
+            const interval = setInterval(() => {
+                if (this.timer > 0) {
+                    this.timer--;
+                } else {
+                    clearInterval(interval);
+                }
+            }, 1000);
+        },
+
+        get formattedTime() {
+            const minutes = Math.floor(this.timer / 60);
+            const seconds = this.timer % 60;
+            return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+    }
+}
+</script>
+{% endblock %}

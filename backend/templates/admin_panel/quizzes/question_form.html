@@ -1,0 +1,86 @@
+{% extends 'admin_panel/base_admin.html' %}
+
+{% block page_title %}{% if question %}Savolni tahrirlash{% else %}Yangi savol{% endif %}{% endblock %}
+{% block page_subtitle %}{{ quiz.title }}{% endblock %}
+
+{% block content %}
+<a href="{% url 'dashboard:quiz_detail' quiz.pk %}" 
+   class="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 mb-6 transition-colors group">
+    <svg class="w-5 h-5 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+    </svg>
+    Testga qaytish
+</a>
+
+<div class="max-w-2xl">
+    <form method="post" class="glass rounded-2xl p-6" x-data="{ loading: false, correctAnswer: '{% if question %}{% for a in question.answers.all %}{% if a.is_correct %}{{ forloop.counter }}{% endif %}{% endfor %}{% else %}1{% endif %}' }" @submit="loading = true">
+        {% csrf_token %}
+        
+        <div class="space-y-6">
+            <!-- Savol matni -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Savol matni <span class="text-red-500">*</span>
+                </label>
+                <textarea name="text" rows="3" required
+                          placeholder="Savol matnini kiriting..."
+                          class="w-full bg-gray-100 dark:bg-dark-700 border-0 rounded-xl py-3 px-4 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none">{{ question.text|default:'' }}</textarea>
+            </div>
+
+            <!-- Tartib raqami -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Tartib raqami
+                </label>
+                <input type="number" name="order" value="{{ question.order|default:'' }}" 
+                       min="0" placeholder="0"
+                       class="w-full bg-gray-100 dark:bg-dark-700 border-0 rounded-xl py-3 px-4 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500">
+            </div>
+
+            <!-- Javoblar -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
+                    Javob variantlari <span class="text-red-500">*</span>
+                </label>
+                
+                <div class="space-y-3">
+    {% for i in "1234" %}
+    <div class="flex items-center gap-3">
+        <input type="radio" name="correct_answer" value="{{ forloop.counter }}"
+               {% if correct_index == forloop.counter %}checked{% endif %}
+               x-model="correctAnswer"
+               class="w-5 h-5 text-primary-500 bg-gray-100 dark:bg-dark-700 border-0 focus:ring-primary-500 focus:ring-2">
+        <input type="text" name="answer_{{ forloop.counter }}"
+               value="{% if answers_list %}{% with ans=answers_list|slice:forloop.counter0|first %}{% if ans %}{{ ans.text }}{% endif %}{% endwith %}{% endif %}"
+               placeholder="{{ forloop.counter }}-javob varianti"
+               class="flex-1 bg-gray-100 dark:bg-dark-700 border-0 rounded-xl py-3 px-4 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500">
+    </div>
+    {% endfor %}
+</div>
+                
+                <p class="mt-3 text-sm text-gray-500">
+                    <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Radio tugmasini bosib to'g'ri javobni belgilang
+                </p>
+            </div>
+        </div>
+
+        <div class="flex justify-end gap-3 mt-8 pt-6 border-t border-gray-200 dark:border-white/10">
+            <a href="{% url 'dashboard:quiz_detail' quiz.pk %}" 
+               class="px-5 py-2.5 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-dark-700 transition-colors font-medium">
+                Bekor qilish
+            </a>
+            <button type="submit" :disabled="loading"
+                    class="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white px-6 py-2.5 rounded-xl transition-all font-medium">
+                <svg x-show="loading" class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                </svg>
+                {% if question %}Saqlash{% else %}Qo'shish{% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

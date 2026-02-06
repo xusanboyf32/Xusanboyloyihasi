@@ -1,0 +1,122 @@
+{% extends 'admin_panel/base_admin.html' %}
+
+{% block page_title %}{% if group %}Guruhni tahrirlash{% else %}Yangi guruh{% endif %}{% endblock %}
+{% block page_subtitle %}{% if group %}{{ group.name }}{% else %}Yangi guruh yaratish{% endif %}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl">
+    <!-- Back link -->
+    <a href="{% url 'dashboard:group_list' %}" class="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 mb-6 transition-colors group">
+        <svg class="w-5 h-5 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+        Guruhlarga qaytish
+    </a>
+    
+    <div class="glass rounded-2xl p-8">
+        <div class="flex items-center gap-4 mb-8">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 dark:from-purple-500/30 dark:to-blue-500/30 flex items-center justify-center">
+                <svg class="w-7 h-7 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+            </div>
+            <div>
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white">
+                    {% if group %}Guruhni tahrirlash{% else %}Yangi guruh{% endif %}
+                </h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Barcha maydonlarni to'ldiring</p>
+            </div>
+        </div>
+        
+        <form method="post" x-data="{ loading: false }" @submit="loading = true">
+            {% csrf_token %}
+            
+            <div class="space-y-6">
+                <!-- Group Type -->
+                <div>
+                    <label for="group_type_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Yo'nalish <span class="text-red-500">*</span>
+                    </label>
+                    <select 
+                        id="group_type_id" 
+                        name="group_type_id"
+                        class="w-full bg-gray-100 dark:bg-dark-700 border-2 border-transparent rounded-xl py-3 px-4 text-gray-900 dark:text-white focus:outline-none focus:border-primary-500 focus:bg-white dark:focus:bg-dark-800 transition-all"
+                        required
+                    >
+                        <option value="">Yo'nalishni tanlang</option>
+                        {% for gt in group_types %}
+                        <option value="{{ gt.pk }}" {% if group.group_type_id == gt.pk or request.GET.type == gt.pk|stringformat:"s" %}selected{% endif %}>
+                            {{ gt.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Name -->
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Guruh nomi <span class="text-red-500">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="name" 
+                        name="name"
+                        value="{{ group.name|default:'' }}"
+                        placeholder="Masalan: B1, G2, Ertalabki"
+                        class="w-full bg-gray-100 dark:bg-dark-700 border-2 border-transparent rounded-xl py-3 px-4 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-primary-500 focus:bg-white dark:focus:bg-dark-800 transition-all"
+                        required
+                    >
+                </div>
+                
+                <!-- Description -->
+                <div>
+                    <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Tavsif
+                    </label>
+                    <textarea 
+                        id="description" 
+                        name="description"
+                        rows="3"
+                        placeholder="Guruh haqida qisqacha..."
+                        class="w-full bg-gray-100 dark:bg-dark-700 border-2 border-transparent rounded-xl py-3 px-4 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-primary-500 focus:bg-white dark:focus:bg-dark-800 transition-all resize-none"
+                    >{{ group.description|default:'' }}</textarea>
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="flex items-center gap-4 mt-8 pt-6 border-t border-gray-200 dark:border-white/10">
+                <button 
+                    type="submit"
+                    :disabled="loading"
+                    class="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium px-6 py-3 rounded-xl transition-all hover:shadow-lg hover:shadow-primary-500/30"
+                >
+                    <span x-show="!loading">
+                        {% if group %}
+                        <svg class="w-5 h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        Saqlash
+                        {% else %}
+                        <svg class="w-5 h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        Yaratish
+                        {% endif %}
+                    </span>
+                    <span x-show="loading" class="flex items-center gap-2">
+                        <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Saqlanmoqda...
+                    </span>
+                </button>
+                
+                <a href="{% url 'dashboard:group_list' %}" class="px-6 py-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white font-medium transition-colors">
+                    Bekor qilish
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

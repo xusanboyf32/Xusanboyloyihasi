@@ -1,0 +1,127 @@
+{% extends 'admin_panel/base_admin.html' %}
+
+{% block page_title %}{% if student %}O'quvchini tahrirlash{% else %}Yangi o'quvchi{% endif %}{% endblock %}
+{% block page_subtitle %}{% if student %}{{ student.full_name }}{% else %}Yangi o'quvchi qo'shish{% endif %}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl">
+    <!-- Back link -->
+    <a href="{% url 'dashboard:student_list' %}" class="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 mb-6 transition-colors group">
+        <svg class="w-5 h-5 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+        O'quvchilarga qaytish
+    </a>
+    
+    <div class="glass rounded-2xl p-8">
+        <div class="flex items-center gap-4 mb-8">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-500 to-purple-500 flex items-center justify-center text-white text-xl font-bold">
+                {% if student %}{{ student.full_name|slice:":1"|upper }}{% else %}?{% endif %}
+            </div>
+            <div>
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white">
+                    {% if student %}O'quvchini tahrirlash{% else %}Yangi o'quvchi{% endif %}
+                </h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Barcha maydonlarni to'ldiring</p>
+            </div>
+        </div>
+        
+        <form method="post" x-data="{ loading: false }" @submit="loading = true">
+            {% csrf_token %}
+            
+            <div class="space-y-6">
+                <!-- Full name -->
+                <div>
+                    <label for="full_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        To'liq ism <span class="text-red-500">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="full_name" 
+                        name="full_name"
+                        value="{{ student.full_name|default:'' }}"
+                        placeholder="Masalan: Aliyev Ali"
+                        class="w-full bg-gray-100 dark:bg-dark-700 border-2 border-transparent rounded-xl py-3 px-4 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-primary-500 focus:bg-white dark:focus:bg-dark-800 transition-all"
+                        required
+                    >
+                </div>
+                
+                <!-- Phone number -->
+                <div>
+                    <label for="phone_number" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Telefon raqam <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 font-medium">+998</span>
+                        <input 
+                            type="tel" 
+                            id="phone_number" 
+                            name="phone_number"
+                            value="{{ student.phone_number|slice:'4:'|default:'' }}"
+                            placeholder="90 123 45 67"
+                            maxlength="12"
+                            class="w-full bg-gray-100 dark:bg-dark-700 border-2 border-transparent rounded-xl py-3 pl-16 pr-4 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-primary-500 focus:bg-white dark:focus:bg-dark-800 transition-all"
+                            required
+                        >
+                    </div>
+                    <p class="mt-2 text-xs text-gray-500">O'quvchi shu raqam bilan tizimga kiradi</p>
+                </div>
+                
+                <!-- Group -->
+                <div>
+                    <label for="group_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Guruh
+                    </label>
+                    <select 
+                        id="group_id" 
+                        name="group_id"
+                        class="w-full bg-gray-100 dark:bg-dark-700 border-2 border-transparent rounded-xl py-3 px-4 text-gray-900 dark:text-white focus:outline-none focus:border-primary-500 focus:bg-white dark:focus:bg-dark-800 transition-all"
+                    >
+                        <option value="">Guruhsiz</option>
+                        {% for group in groups %}
+                        <option value="{{ group.pk }}" {% if student.group_id == group.pk or request.GET.group == group.pk|stringformat:"s" %}selected{% endif %}>
+                            {{ group.group_type.name }} - {{ group.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <p class="mt-2 text-xs text-gray-500">Keyinroq ham guruhga biriktirish mumkin</p>
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="flex items-center gap-4 mt-8 pt-6 border-t border-gray-200 dark:border-white/10">
+                <button 
+                    type="submit"
+                    :disabled="loading"
+                    class="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium px-6 py-3 rounded-xl transition-all hover:shadow-lg hover:shadow-primary-500/30"
+                >
+                    <span x-show="!loading">
+                        {% if student %}
+                        <svg class="w-5 h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        Saqlash
+                        {% else %}
+                        <svg class="w-5 h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                        </svg>
+                        Qo'shish
+                        {% endif %}
+                    </span>
+                    <span x-show="loading" class="flex items-center gap-2">
+                        <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Saqlanmoqda...
+                    </span>
+                </button>
+                
+                <a href="{% url 'dashboard:student_list' %}" class="px-6 py-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white font-medium transition-colors">
+                    Bekor qilish
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

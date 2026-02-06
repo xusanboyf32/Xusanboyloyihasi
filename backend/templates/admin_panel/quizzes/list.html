@@ -1,0 +1,110 @@
+{% extends 'admin_panel/base_admin.html' %}
+
+{% block page_title %}Testlar{% endblock %}
+{% block page_subtitle %}Mini testlar boshqaruvi{% endblock %}
+
+{% block header_actions %}
+<a href="{% url 'dashboard:quiz_create' %}" 
+   class="inline-flex items-center gap-2 bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 text-white px-5 py-2.5 rounded-xl transition-all font-medium glow-sm hover:glow">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+    </svg>
+    Yangi test
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="glass rounded-2xl overflow-hidden">
+    {% if quizzes %}
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead>
+                <tr class="border-b border-gray-200 dark:border-white/10">
+                    <th class="text-left py-4 px-6 text-sm font-semibold text-gray-900 dark:text-white">Test</th>
+                    <th class="text-left py-4 px-6 text-sm font-semibold text-gray-900 dark:text-white">Dars</th>
+                    <th class="text-center py-4 px-6 text-sm font-semibold text-gray-900 dark:text-white">Savollar</th>
+                    <th class="text-center py-4 px-6 text-sm font-semibold text-gray-900 dark:text-white">O'tish balli</th>
+                    <th class="text-center py-4 px-6 text-sm font-semibold text-gray-900 dark:text-white">Urinishlar</th>
+                    <th class="text-center py-4 px-6 text-sm font-semibold text-gray-900 dark:text-white">Holat</th>
+                    <th class="text-right py-4 px-6 text-sm font-semibold text-gray-900 dark:text-white">Amallar</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 dark:divide-white/5">
+                {% for quiz in quizzes %}
+                <tr class="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                    <td class="py-4 px-6">
+                        <a href="{% url 'dashboard:quiz_detail' quiz.pk %}" class="font-medium text-gray-900 dark:text-white hover:text-primary-500">
+                            {{ quiz.title }}
+                        </a>
+                    </td>
+                    <td class="py-4 px-6">
+                        <div class="flex items-center gap-2">
+                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-blue-500/10 text-blue-500 text-sm font-bold">
+                                {{ quiz.lesson.order }}
+                            </span>
+                            <span class="text-gray-600 dark:text-gray-400">{{ quiz.lesson.title|truncatechars:30 }}</span>
+                        </div>
+                    </td>
+                    <td class="py-4 px-6 text-center">
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-gray-100 dark:bg-dark-700 text-gray-600 dark:text-gray-400">
+                            {{ quiz.questions_count }}
+                        </span>
+                    </td>
+                    <td class="py-4 px-6 text-center">
+                        <span class="text-gray-600 dark:text-gray-400">{{ quiz.passing_score }}%</span>
+                    </td>
+                    <td class="py-4 px-6 text-center">
+                        <span class="text-gray-600 dark:text-gray-400">{{ quiz.max_attempts }}</span>
+                    </td>
+                    <td class="py-4 px-6 text-center">
+                        {% if quiz.is_active %}
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-green-500/10 text-green-600 dark:text-green-400">
+                            Faol
+                        </span>
+                        {% else %}
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-gray-100 dark:bg-dark-700 text-gray-500">
+                            Nofaol
+                        </span>
+                        {% endif %}
+                    </td>
+                    <td class="py-4 px-6">
+                        <div class="flex items-center justify-end gap-2">
+                            <a href="{% url 'dashboard:quiz_detail' quiz.pk %}" 
+                               class="p-2 text-gray-400 hover:text-primary-500 transition-colors" title="Ko'rish">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                </svg>
+                            </a>
+                            <a href="{% url 'dashboard:quiz_edit' quiz.pk %}" 
+                               class="p-2 text-gray-400 hover:text-blue-500 transition-colors" title="Tahrirlash">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-center py-16">
+        <div class="w-20 h-20 rounded-3xl bg-gray-100 dark:bg-dark-700 flex items-center justify-center mx-auto mb-4">
+            <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+            </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Testlar yo'q</h3>
+        <p class="text-gray-500 dark:text-gray-400 mb-6">Darslar uchun mini testlar yarating</p>
+        <a href="{% url 'dashboard:quiz_create' %}" class="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white px-5 py-2.5 rounded-xl transition-all font-medium">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Birinchi testni yaratish
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

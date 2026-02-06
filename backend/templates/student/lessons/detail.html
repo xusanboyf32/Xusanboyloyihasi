@@ -1,0 +1,180 @@
+{% extends 'student/base_student.html' %}
+
+{% block title %}{{ lesson.title }} - EduPlatform{% endblock %}
+
+{% block content %}
+<!-- Back link -->
+<a href="{% url 'student:lesson_list' %}" class="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 mb-6 transition-colors group">
+    <svg class="w-5 h-5 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+    </svg>
+    Darslarga qaytish
+</a>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Main content -->
+    <div class="lg:col-span-2 space-y-6">
+        <!-- Video player -->
+        <div class="glass rounded-2xl overflow-hidden">
+            {% if lesson.kinescope_video_id %}
+            <div class="aspect-video bg-black">
+                <iframe 
+                    src="{% if kinescope_embed_url %}{{ kinescope_embed_url }}{% else %}https://kinescope.io/embed/{{ lesson.kinescope_video_id }}{% endif %}"
+                    allow="autoplay; fullscreen; picture-in-picture; encrypted-media; gyroscope; accelerometer; clipboard-write;"
+                    frameborder="0"
+                    allowfullscreen
+                    class="w-full h-full"
+                ></iframe>
+            </div>
+            {% else %}
+            <div class="aspect-video bg-gray-900 flex items-center justify-center">
+                <div class="text-center">
+                    <svg class="w-16 h-16 text-gray-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                    </svg>
+                    <p class="text-gray-500">Video tez orada qo'shiladi</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Lesson info -->
+            <div class="p-6">
+                <div class="flex items-start justify-between gap-4 mb-4">
+                    <div>
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-primary-500/10 text-primary-600 dark:text-primary-400 mb-2">
+                            {{ lesson.order }}-dars
+                        </span>
+                        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ lesson.title }}</h1>
+                    </div>
+
+                    {% if progress.is_completed %}
+                    <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-sm font-medium bg-green-500/10 text-green-600 dark:text-green-400 flex-shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        Tugatilgan
+                    </span>
+                    {% endif %}
+                </div>
+
+                {% if lesson.description %}
+                <p class="text-gray-600 dark:text-gray-400">{{ lesson.description }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Notion content -->
+        {% if notion_content %}
+        <div class="glass rounded-2xl p-6">
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M4.459 4.208c.746.606 1.026.56 2.428.466l13.215-.793c.28 0 .047-.28-.046-.326L17.86 2.02c-.467-.373-.979-.467-1.632-.373L2.827 3.074c-.467.093-.56.28-.373.466l2.005 1.141v-.473zM5.672 7.229v12.57c0 .747.28 1.073.933 1.027l14.523-.84c.653-.046.746-.42.746-.887V7.696c0-.467-.14-.7-.513-.653l-15.176.886c-.42.046-.513.233-.513.653v-.353z"/>
+                </svg>
+                Qo'shimcha materiallar
+            </h2>
+            <div class="prose dark:prose-invert max-w-none">
+                {{ notion_content|safe }}
+            </div>
+        </div>
+        {% elif lesson.notion_page_id %}
+        <div class="glass rounded-2xl p-6">
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M4.459 4.208c.746.606 1.026.56 2.428.466l13.215-.793c.28 0 .047-.28-.046-.326L17.86 2.02c-.467-.373-.979-.467-1.632-.373L2.827 3.074c-.467.093-.56.28-.373.466l2.005 1.141v-.473zM5.672 7.229v12.57c0 .747.28 1.073.933 1.027l14.523-.84c.653-.046.746-.42.746-.887V7.696c0-.467-.14-.7-.513-.653l-15.176.886c-.42.046-.513.233-.513.653v-.353z"/>
+                </svg>
+                Qo'shimcha materiallar
+            </h2>
+            <div class="prose dark:prose-invert max-w-none">
+                <p class="text-gray-500">Notion sahifa kontenti yuklanmoqda...</p>
+                <a href="https://notion.so/{{ lesson.notion_page_id|cut:'-' }}" target="_blank" class="text-primary-500 hover:text-primary-600">
+                    Notion da ochish →
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Sidebar -->
+    <div class="lg:col-span-1 space-y-6">
+        <!-- Complete button -->
+        {% if not progress.is_completed %}
+        <div class="glass rounded-2xl p-6">
+            <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Darsni yakunlash</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Videoni ko'rib bo'lgach, darsni yakunlangan deb belgilang</p>
+            <form method="post" action="{% url 'student:lesson_complete' lesson.slug %}">
+                {% csrf_token %}
+                <button type="submit" class="w-full inline-flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-medium px-4 py-3 rounded-xl transition-all">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Darsni yakunladim
+                </button>
+            </form>
+        </div>
+        {% endif %}
+
+        <!-- Quiz section -->
+        {% if lesson.quiz %}
+        <div class="glass rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center">
+                    <svg class="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-900 dark:text-white">{{ lesson.quiz.title }}</h3>
+                    <p class="text-sm text-gray-500">{{ lesson.quiz.questions.count }} savol • O'tish balli: {{ lesson.quiz.passing_score }}%</p>
+                </div>
+            </div>
+
+            <a href="{% url 'quizzes:detail' lesson.quiz.pk %}"
+               class="w-full inline-flex items-center justify-center gap-2 bg-purple-500 hover:bg-purple-600 text-white font-medium px-4 py-3 rounded-xl transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+                Testni boshlash
+            </a>
+        </div>
+        {% endif %}
+
+        <!-- Navigation -->
+        <div class="glass rounded-2xl p-6">
+            <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-4">Navigatsiya</h3>
+            
+            <div class="space-y-3">
+                {% if prev_lesson %}
+                <a href="{% url 'student:lesson_detail' prev_lesson.slug %}" class="flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-dark-700/50 hover:bg-gray-100 dark:hover:bg-dark-700 transition-colors group">
+                    <svg class="w-5 h-5 text-gray-400 group-hover:text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-xs text-gray-500">Oldingi dars</p>
+                        <p class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ prev_lesson.title }}</p>
+                    </div>
+                </a>
+                {% endif %}
+                
+                {% if next_lesson %}
+                <a href="{% if can_access_next %}{% url 'student:lesson_detail' next_lesson.slug %}{% else %}#{% endif %}" 
+                   class="flex items-center gap-3 p-3 rounded-xl {% if can_access_next %}bg-gray-50 dark:bg-dark-700/50 hover:bg-gray-100 dark:hover:bg-dark-700{% else %}bg-gray-50/50 dark:bg-dark-700/30 cursor-not-allowed{% endif %} transition-colors group">
+                    <div class="flex-1 min-w-0">
+                        <p class="text-xs text-gray-500">Keyingi dars</p>
+                        <p class="text-sm font-medium {% if can_access_next %}text-gray-900 dark:text-white{% else %}text-gray-400{% endif %} truncate">{{ next_lesson.title }}</p>
+                    </div>
+                    {% if can_access_next %}
+                    <svg class="w-5 h-5 text-gray-400 group-hover:text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                    {% else %}
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    </svg>
+                    {% endif %}
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

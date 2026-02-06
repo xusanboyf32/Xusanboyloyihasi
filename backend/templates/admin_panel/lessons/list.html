@@ -1,0 +1,143 @@
+{% extends 'admin_panel/base_admin.html' %}
+
+{% block page_title %}Darslar{% endblock %}
+{% block page_subtitle %}Video darslarni boshqarish{% endblock %}
+
+{% block header_actions %}
+<a href="{% url 'dashboard:lesson_create' %}" class="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white px-4 py-2.5 rounded-xl transition-all hover:shadow-lg hover:shadow-primary-500/30 font-medium">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+    </svg>
+    <span class="hidden sm:inline">Yangi dars</span>
+</a>
+{% endblock %}
+
+{% block content %}
+{% if lessons %}
+<!-- Stats -->
+<div class="flex items-center gap-2 mb-4 text-sm text-gray-500 dark:text-gray-400">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+    </svg>
+    <span>Jami: <strong class="text-gray-900 dark:text-white">{{ lessons|length }}</strong> ta dars</span>
+</div>
+
+<div class="space-y-4">
+    {% for lesson in lessons %}
+    <div class="glass rounded-2xl p-6 card-hover group relative overflow-hidden {% if not lesson.is_active %}opacity-60{% endif %}">
+        <!-- Decorative -->
+        <div class="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-500/10 to-purple-500/10 dark:from-blue-500/20 dark:to-purple-500/20 rounded-full -translate-y-20 translate-x-20 group-hover:scale-150 transition-transform duration-500"></div>
+        
+        <div class="relative flex flex-col sm:flex-row sm:items-center gap-4">
+            <!-- Order number -->
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 dark:from-blue-500/30 dark:to-purple-500/30 flex items-center justify-center flex-shrink-0">
+                <span class="text-2xl font-bold text-blue-500">{{ lesson.order }}</span>
+            </div>
+            
+            <!-- Content -->
+            <div class="flex-1 min-w-0">
+                <div class="flex flex-wrap items-center gap-2 mb-1">
+                    <a href="{% url 'dashboard:lesson_detail' lesson.pk %}" class="text-lg font-bold text-gray-900 dark:text-white hover:text-primary-500 transition-colors truncate">
+                        {{ lesson.title }}
+                    </a>
+                    {% if not lesson.is_active %}
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-medium bg-gray-100 dark:bg-dark-700 text-gray-500">
+                        Nofaol
+                    </span>
+                    {% endif %}
+                </div>
+                
+                {% if lesson.description %}
+                <p class="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 mb-2">{{ lesson.description }}</p>
+                {% endif %}
+                
+                <!-- Meta info -->
+                <div class="flex flex-wrap items-center gap-3 text-sm">
+                    {% if lesson.kinescope_video_id %}
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-green-500/10 text-green-600 dark:text-green-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                        </svg>
+                        Video bor
+                    </span>
+                    {% else %}
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gray-100 dark:bg-dark-700 text-gray-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                        </svg>
+                        Video yo'q
+                    </span>
+                    {% endif %}
+                    
+                    {% if lesson.notion_page_id %}
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gray-100 dark:bg-dark-700 text-gray-600 dark:text-gray-400">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M4.459 4.208c.746.606 1.026.56 2.428.466l13.215-.793c.28 0 .047-.28-.046-.326L17.86 2.02c-.467-.373-.979-.467-1.632-.373L2.827 3.074c-.467.093-.56.28-.373.466l2.005 1.141v-.473zM5.672 7.229v12.57c0 .747.28 1.073.933 1.027l14.523-.84c.653-.046.746-.42.746-.887V7.696c0-.467-.14-.7-.513-.653l-15.176.886c-.42.046-.513.233-.513.653v-.353zm14.336 1.073c.093.42 0 .84-.42.887l-.7.14v9.323c-.607.327-1.166.514-1.633.514-.746 0-.933-.234-1.492-.934l-4.571-7.175v6.942l1.446.327s0 .84-1.166.84l-3.218.187c-.093-.187 0-.653.327-.746l.84-.233V8.862l-1.166-.093c-.093-.42.14-1.026.793-1.073l3.451-.234 4.758 7.269V8.395l-1.213-.14c-.093-.513.28-.887.746-.933l3.218-.187z"/>
+                        </svg>
+                        Notion
+                    </span>
+                    {% endif %}
+                    
+                    {% if lesson.video_duration %}
+                    <span class="inline-flex items-center gap-1.5 text-gray-500">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        {{ lesson.video_duration|floatformat:0 }} min
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                <a href="{% url 'dashboard:lesson_detail' lesson.pk %}" 
+                   class="p-2.5 text-gray-400 hover:text-primary-500 hover:bg-primary-500/10 rounded-xl transition-all"
+                   title="Ko'rish">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                    </svg>
+                </a>
+                <a href="{% url 'dashboard:lesson_edit' lesson.pk %}" 
+                   class="p-2.5 text-gray-400 hover:text-blue-500 hover:bg-blue-500/10 rounded-xl transition-all"
+                   title="Tahrirlash">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    </svg>
+                </a>
+                <form method="post" action="{% url 'dashboard:lesson_delete' lesson.pk %}" class="inline"
+                      onsubmit="return confirm('{{ lesson.title }} darsini o\'chirmoqchimisiz?')">
+                    {% csrf_token %}
+                    <button type="submit" 
+                            class="p-2.5 text-gray-400 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
+                            title="O'chirish">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<!-- Empty state -->
+<div class="glass rounded-3xl p-12 text-center max-w-lg mx-auto">
+    <div class="w-20 h-20 rounded-3xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 dark:from-blue-500/30 dark:to-purple-500/30 flex items-center justify-center mx-auto mb-6">
+        <svg class="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+        </svg>
+    </div>
+    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Darslar yo'q</h3>
+    <p class="text-gray-500 dark:text-gray-400 mb-8">Video darslaringizni qo'shishni boshlang</p>
+    <a href="{% url 'dashboard:lesson_create' %}" class="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white px-6 py-3 rounded-xl transition-all hover:shadow-lg hover:shadow-primary-500/30 font-medium">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        Birinchi darsni qo'shing
+    </a>
+</div>
+{% endif %}
+{% endblock %}

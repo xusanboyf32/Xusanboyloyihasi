@@ -1,0 +1,90 @@
+{% extends 'student/base_student.html' %}
+
+{% block title %}Natija - {{ quiz.title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto text-center">
+    <!-- Result card -->
+    <div class="glass rounded-3xl p-8 mb-6">
+        {% if attempt.is_passed %}
+        <!-- Success -->
+        <div class="w-24 h-24 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-6 animate-bounce-slow">
+            <svg class="w-14 h-14 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+        </div>
+        
+        <h1 class="text-3xl font-bold text-green-500 mb-2">Tabriklaymiz! 🎉</h1>
+        <p class="text-gray-600 dark:text-gray-400 mb-6">Siz testdan muvaffaqiyatli o'tdingiz</p>
+        {% else %}
+        <!-- Failed -->
+        <div class="w-24 h-24 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-6">
+            <svg class="w-14 h-14 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+        </div>
+        
+        <h1 class="text-3xl font-bold text-red-500 mb-2">Afsuski o'tmadingiz</h1>
+        <p class="text-gray-600 dark:text-gray-400 mb-6">Qaytadan urinib ko'ring</p>
+        {% endif %}
+
+        <!-- Score -->
+        <div class="relative w-40 h-40 mx-auto mb-8">
+            <svg class="w-40 h-40 transform -rotate-90">
+                <circle cx="80" cy="80" r="70" fill="none" stroke-width="12" 
+                        class="{% if attempt.is_passed %}stroke-green-500/20{% else %}stroke-red-500/20{% endif %}"/>
+                <circle cx="80" cy="80" r="70" fill="none" stroke-width="12" 
+                        stroke-linecap="round"
+                        class="{% if attempt.is_passed %}stroke-green-500{% else %}stroke-red-500{% endif %}"
+                        stroke-dasharray="{{ stroke_dasharray }} 440"/>
+            </svg>
+            <div class="absolute inset-0 flex items-center justify-center">
+                <span class="text-5xl font-bold {% if attempt.is_passed %}text-green-500{% else %}text-red-500{% endif %}">{{ attempt.score }}%</span>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-2 gap-4 mb-8">
+            <div class="p-4 rounded-xl bg-gray-50 dark:bg-dark-700/50">
+                <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ quiz.passing_score }}%</p>
+                <p class="text-sm text-gray-500">O'tish balli</p>
+            </div>
+            <div class="p-4 rounded-xl bg-gray-50 dark:bg-dark-700/50">
+                <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ remaining_attempts }}</p>
+                <p class="text-sm text-gray-500">Qolgan urinish</p>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+            {% if attempt.is_passed %}
+            <a href="{% url 'student:dashboard' %}" 
+               class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 text-white font-semibold py-3 px-6 rounded-xl transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                </svg>
+                Davom etish
+            </a>
+            {% else %}
+            {% if remaining_attempts > 0 %}
+            <a href="{% url 'quizzes:start' quiz.pk %}" 
+               class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 text-white font-semibold py-3 px-6 rounded-xl transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+                Qayta urinish
+            </a>
+            {% endif %}
+            {% endif %}
+            
+            <a href="{% url 'student:lesson_detail' quiz.lesson.pk %}" 
+               class="inline-flex items-center justify-center gap-2 bg-gray-100 dark:bg-dark-700 hover:bg-gray-200 dark:hover:bg-dark-600 text-gray-700 dark:text-gray-300 font-semibold py-3 px-6 rounded-xl transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12"/>
+                </svg>
+                Darsga qaytish
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

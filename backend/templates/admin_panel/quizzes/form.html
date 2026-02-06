@@ -1,0 +1,100 @@
+{% extends 'admin_panel/base_admin.html' %}
+
+{% block page_title %}{% if quiz %}Testni tahrirlash{% else %}Yangi test{% endif %}{% endblock %}
+{% block page_subtitle %}{% if quiz %}{{ quiz.title }}{% else %}Dars uchun mini test yaratish{% endif %}{% endblock %}
+
+{% block content %}
+<a href="{% if quiz %}{% url 'dashboard:quiz_detail' quiz.pk %}{% else %}{% url 'dashboard:quiz_list' %}{% endif %}" 
+   class="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 mb-6 transition-colors group">
+    <svg class="w-5 h-5 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+    </svg>
+    Orqaga qaytish
+</a>
+
+<div class="max-w-2xl">
+    <form method="post" class="glass rounded-2xl p-6" x-data="{ loading: false }" @submit="loading = true">
+        {% csrf_token %}
+        
+        <div class="space-y-6">
+            {% if not quiz %}
+            <!-- Dars tanlash -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Dars <span class="text-red-500">*</span>
+                </label>
+                <select name="lesson_id" required
+                        class="w-full bg-gray-100 dark:bg-dark-700 border-0 rounded-xl py-3 px-4 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500">
+                    <option value="">Darsni tanlang</option>
+                    {% for lesson in lessons %}
+                    <option value="{{ lesson.pk }}">{{ lesson.order }}. {{ lesson.title }}</option>
+                    {% endfor %}
+                </select>
+                {% if not lessons %}
+                <p class="mt-2 text-sm text-amber-600">Barcha darslarga test qo'shilgan yoki dars mavjud emas</p>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Test nomi -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Test nomi <span class="text-red-500">*</span>
+                </label>
+                <input type="text" name="title" value="{{ quiz.title|default:'' }}" required
+                       placeholder="Masalan: 1-dars testi"
+                       class="w-full bg-gray-100 dark:bg-dark-700 border-0 rounded-xl py-3 px-4 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500">
+            </div>
+
+            <!-- O'tish balli -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    O'tish balli (%)
+                </label>
+                <input type="number" name="passing_score" value="{{ quiz.passing_score|default:70 }}" 
+                       min="1" max="100"
+                       class="w-full bg-gray-100 dark:bg-dark-700 border-0 rounded-xl py-3 px-4 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500">
+                <p class="mt-1 text-sm text-gray-500">O'quvchi testdan o'tishi uchun minimal ball</p>
+            </div>
+
+            <!-- Maksimal urinishlar -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Maksimal urinishlar soni
+                </label>
+                <input type="number" name="max_attempts" value="{{ quiz.max_attempts|default:3 }}" 
+                       min="1" max="10"
+                       class="w-full bg-gray-100 dark:bg-dark-700 border-0 rounded-xl py-3 px-4 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500">
+                <p class="mt-1 text-sm text-gray-500">O'quvchi necha marta urinish qila oladi</p>
+            </div>
+
+            {% if quiz %}
+            <!-- Faol/Nofaol -->
+            <div class="flex items-center gap-3">
+                <input type="checkbox" name="is_active" id="is_active" 
+                       {% if quiz.is_active %}checked{% endif %}
+                       class="w-5 h-5 rounded-lg text-primary-500 bg-gray-100 dark:bg-dark-700 border-0 focus:ring-primary-500 focus:ring-2">
+                <label for="is_active" class="text-sm text-gray-700 dark:text-gray-300">
+                    Test faol (o'quvchilar ko'ra oladi)
+                </label>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="flex justify-end gap-3 mt-8 pt-6 border-t border-gray-200 dark:border-white/10">
+            <a href="{% if quiz %}{% url 'dashboard:quiz_detail' quiz.pk %}{% else %}{% url 'dashboard:quiz_list' %}{% endif %}" 
+               class="px-5 py-2.5 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-dark-700 transition-colors font-medium">
+                Bekor qilish
+            </a>
+            <button type="submit" :disabled="loading"
+                    class="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white px-6 py-2.5 rounded-xl transition-all font-medium">
+                <svg x-show="loading" class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                </svg>
+                {% if quiz %}Saqlash{% else %}Yaratish{% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
