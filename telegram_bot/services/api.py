@@ -1,5 +1,5 @@
 import httpx
-from config import BACKEND_URL, BOT_API_TOKEN
+from telegram_bot.config import BACKEND_URL, BOT_API_TOKEN
 
 
 class BackendAPI:
